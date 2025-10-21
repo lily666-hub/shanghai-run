@@ -1,0 +1,132 @@
+body {
+  margin: 0;
+  font-family: "Microsoft YaHei", sans-serif;
+  background-color: #f4f6f8;
+  color: #333;
+}
+
+/* 顶部背景区域 */
+.hero-section {
+  position: relative;
+  text-align: center;
+  color: white;
+  padding: 100px 20px 60px;
+  background-image: url("bb01984d-0dc0-41f3-8c4c-c2fac5614cc4.jpg"); /* 你的上传背景图文件名 */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.hero-section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+}
+
+.hero-section h1 {
+  position: relative;
+  font-size: 2rem;
+  font-weight: bold;
+  z-index: 1;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+/* 卡片区块容器 */
+.form-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  margin-top: -60px;
+  padding: 20px;
+}
+
+/* 卡片基础样式 */
+.card {
+  width: 260px;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  background-color: white;
+  text-align: left;
+}
+
+/* 不同主题色卡片 */
+.base-info { background: #fff5e6; }
+.sport-pref { background: #e6f9ff; }
+.interest-line { background: #ffe6f0; }
+.challenge-goal { background: #e8f0ff; }
+
+.card h2 {
+  font-size: 1.1rem;
+  margin-bottom: 10px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.card input[type="number"],
+.card input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  margin: 6px 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+/* 标签按钮 */
+.tags button {
+  background: white;
+  border: 1px solid #aaa;
+  border-radius: 20px;
+  margin: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.tags button:hover {
+  background: #0078ff;
+  color: white;
+}
+
+/* 挑战目标 */
+.challenge-goal button {
+  width: 100%;
+  margin-top: 10px;
+  background: #0078ff;
+  border: none;
+  color: white;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.challenge-goal button:hover {
+  background: #005ecc;
+}
+
+/* 地图样式 */
+#map {
+  width: 100%;
+  height: 500px;
+  margin-top: 30px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* 响应式 */
+@media (max-width: 768px) {
+  .form-container {
+    flex-direction: column;
+    align-items: center;
+  }
+  .card {
+    width: 90%;
+  }
+}
