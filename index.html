@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>上海城市跑 · 智能路线推荐</title>
+
+  <!-- 字体 -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --accent:#00796b;
+      --accent-dark:#005949;
+      --card-bg: rgba(255,255,255,0.95);
+      --glass: rgba(255,255,255,0.6);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:"Noto Sans SC", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(180deg,#e6f7fb 0%, #ffffff 40%);
+      color:#333;
+      -webkit-font-smoothing:antialiased;
+    }
+
+    /* hero */
+    .hero{
+      background: url("https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/The_Bund%2C_Shanghai%2C_China.jpg/1920px-The_Bund%2C_Shanghai%2C_China.jpg") center/cover no-repeat;
+      height:240px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:white;
+      text-align:center;
+      position:relative;
+    }
+    .hero::after{
+      content:"";
+      position:absolute;left:0;right:0;top:0;bottom:0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.15));
+    }
+    .hero .title{
+      position:relative;
+      z-index:1;
+      font-size:30px;
+      font-weight:700;
+      letter-spacing:1px;
+    }
+    .subtitle{
+      position:relative; z-index:1; margin-top:6px; font-size:14px; opacity:0.95;
+    }
+
+    /* layout */
+    .wrap{
+      max-width:1100px;
+      margin:-60px auto 40px;
+      padding: 0 18px;
+    }
+    .cards{
+      display:flex;
+      gap:18px;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+
+    .card{
+      width:260px;
+      background:var(--card-bg);
+      border-radius:14px;
+      padding:18px;
+      box-shadow:0 8px 24px rgba(15,30,40,0.08);
+      backdrop-filter: blur(6px);
+      color:#123;
+    }
+    .card h3{
+      margin:0 0 12px; font-size:18px; color:var(--accent-dark);
+      display:flex; align-items:center; gap:8px;
+    }
+    label{display:block; font-size:13px; margin:8px 0 6px; color:#444;}
+    input[type="number"], input[type="text"], select {
+      width:100%; padding:8px 10px; border-radius:8px; border:1px solid #ddd; font-size:14px;
+    }
+    .checkbox-group{display:flex;flex-wrap:wrap; gap:8px}
+    .tag{
+      background:#f1f9f8; padding:6px 10px; border-radius:12px; cursor:pointer; font-size:13px;
+      border:1px solid rgba(0,0,0,0.05)
+    }
+    .tag.active{background:var(--accent); color:#fff; border-color:transparent}
+
+    .button {
+      margin-top:12px;
+      width:100%;
+      padding:12px 14px;
+      border-radius:10px;
+      border:none;
+      cursor:pointer;
+      color:#fff;
+      font-weight:600;
+      background:linear-gradient(180deg,var(--accent),var(--accent-dark));
+      box-shadow:0 6px 18px rgba(0,121,107,0.18);
+      font-size:15px;
+    }
+
+    /* map + info */
+    .map-area{
+      margin-top:22px;
+      display:flex;
+      gap:18px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+      justify-content:center;
+    }
+    #map {
+      width:680px;
+      height:420px;
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow:0 12px 28px rgba(0,0,0,0.08);
+      border:1px solid rgba(0,0,0,0.06);
+      background:#f7f7f7;
+    }
+
+    .result-panel{
+      width:360px;
+      background:var(--glass);
+      border-radius:12px;
+      padding:14px;
+      box-shadow:0 10px 24px rgba(0,0,0,0.06);
+      color:#123;
+    }
+    .result-card{background:#fff; padding:12px; border-radius:10px; margin-bottom:12px; border:1px solid #eee}
+    .result-card h4{margin:0 0 6px; color:var(--accent-dark)}
+    .result-row{display:flex;justify-content:space-between; font-size:14px; margin:6px 0}
+    .route-photo{width:100%; height:120px; object-fit:cover; border-radius:8px; margin-top:8px}
+
+    /* footer note */
+    .note{font-size:12px; text-align:center; color:#666; margin-top:18px}
+    @media(max-width:980px){
+      #map{width:100%;height:340px}
+      .result-panel{width:100%}
+      .cards{justify-content:center}
+    }
+  </style>
+</head>
+<body>
+
+  <div class="hero">
+    <div>
+      <div class="title">跑过上海，每一步都是风景</div>
+      <div class="subtitle">在城市里跑，感受历史与现代的交融 · 同时锻炼身体、收获乐趣</div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="cards">
+      <!-- card 1: 体能基础 -->
+      <div class="card" id="card-basic">
+        <h3>体能基础</h3>
+        <label>身高 (cm)</label>
+        <input type="number" id="height" min="80" max="250" placeholder="例如 170">
+        <label>体重 (kg)</label>
+        <input type="number" id="weight" min="20" max="300" placeholder="例如 60">
+        <label>年龄</label>
+        <input type="number" id="age" min="8" max="120" placeholder="例如 28">
+      </div>
+
+      <!-- card 2: 运动偏好 -->
+      <div class="card" id="card-prefer">
+        <h3>运动偏好</h3>
+        <label>预期跑步距离 (km)</label>
+        <input type="number" id="distance" step="0.1" placeholder="例如 5">
+        <label>预期时长 (分钟)</label>
+        <input type="number" id="duration" placeholder="例如 30">
+        <label>目标配速 (min/km，可留空由距离+时长计算)</label>
+        <input type="text" id="pace" placeholder="例如 6 或 6:00">
+      </div>
+
+      <!-- card 3: 兴趣路线 -->
+      <div class="card" id="card-interest">
+        <h3>兴趣路线</h3>
+        <div class="checkbox-group" id="interestTags">
+          <div class="tag" data-val="历史建筑">历史建筑</div>
+          <div class="tag" data-val="现代艺术">现代艺术</div>
+          <div class="tag" data-val="自然风光">自然风光</div>
+          <div class="tag" data-val="市井烟火气">市井烟火气</div>
+        </div>
+      </div>
+
+      <!-- card 4: 挑战目标 -->
+      <div class="card" id="card-challenge">
+        <h3>挑战目标</h3>
+        <label><input type="checkbox" id="virtualRace"> 开启虚拟竞赛</label>
+        <label style="margin-top:10px">最佳成绩（该距离，总用时，分钟）</label>
+        <input type="number" id="bestTime" placeholder="例如 25">
+        <button class="button" id="btnGenerate">生成我的专属上海跑路线</button>
+      </div>
+    </div>
+
+    <div class="map-area">
+      <div id="map"></div>
+
+      <div class="result-panel">
+        <div class="result-card" id="card-bmi">
+          <h4>体能评估 · BMI</h4>
+          <div class="result-row"><div>BMI</div><div id="bmi">—</div></div>
+          <div class="result-row"><div>体能建议</div><div id="bmiAdvice">—</div></div>
+        </div>
+
+        <div class="result-card" id="card-energy">
+          <h4>运动建议 · 估算</h4>
+          <div class="result-row"><div>预计配速</div><div id="estPace">—</div></div>
+          <div class="result-row"><div>预计消耗 (kcal)</div><div id="calorie">—</div></div>
+          <div class="result-row"><div>强度建议</div><div id="intensity">—</div></div>
+        </div>
+
+        <div class="result-card" id="card-route">
+          <h4>路线推荐</h4>
+          <div class="result-row"><div>兴趣</div><div id="selTags">—</div></div>
+          <div class="result-row"><div>推荐路线</div><div id="routeName">—</div></div>
+          <img id="routePhoto" class="route-photo" src="" alt="路线图示" style="display:none">
+        </div>
+
+        <div class="result-card" id="card-ch">
+          <h4>挑战反馈</h4>
+          <div class="result-row"><div>是否竞赛</div><div id="raceOn">—</div></div>
+          <div class="result-row"><div>进度提示</div><div id="raceMsg">—</div></div>
+        </div>
+
+        <div class="note">提示：路线为推荐示例，真实跑步请关注安全与道路交通规则。</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 高德地图（使用你提供的 key） -->
+  <script src="https://webapi.amap.com/maps?v=2.0&key=5c65d76d3600ef99bc76b95adb89c022"></script>
+
+  <script>
+    // ========== 路线数据（预定义几条示例路线，含坐标与示意图） ==========
+    const ROUTES = {
+      "历史建筑": {
+        name: "外滩 — 南京东路 — 豫园",
+        coords: [
+          [121.4905,31.2410], // approximate bund
+          [121.4900,31.2350],
+          [121.4820,31.2340],
+          [121.4870,31.2260] // yuz garden area
+        ],
+        photo: "https://upload.wikimedia.org/wikipedia/commons/7/7b/The_Bund_%28Shanghai%29_2014.jpg"
+      },
+      "现代艺术": {
+        name: "西岸美术馆 — 龙美术馆 — 徐汇滨江",
+        coords: [
+          [121.4425,31.2186], // west bund
+          [121.4550,31.2230],
+          [121.4510,31.2100]
+        ],
+        photo: "https://upload.wikimedia.org/wikipedia/commons/5/5c/West_Bund_Museum.jpg"
+      },
+      "自然风光": {
+        name: "世纪公园环线",
+        coords: [
+          [121.5400,31.2176],
+          [121.5440,31.2130],
+          [121.5320,31.2115]
+        ],
+        photo: "https://upload.wikimedia.org/wikipedia/commons/2/20/Century_Park%2C_Shanghai_%28cropped%29.jpg"
+      },
+      "市井烟火气": {
+        name: "七宝老街 — 南翔古镇（短线）",
+        coords: [
+          [121.3960,31.1486],
+          [121.3090,31.2850],
+        ],
+        photo: "https://upload.wikimedia.org/wikipedia/commons/4/4b/Qibao_Old_Street.jpg"
+      }
+    };
+
+    // ========== 地图初始化 ==========
+    const map = new AMap.Map('map', {
+      center: [121.4737,31.2304],
+      zoom: 12,
+    });
+
+    let currentPolyline = null;
+    let currentMarkers = [];
+
+    // 点击标签交互
+    document.querySelectorAll('.tag').forEach(tag=>{
+      tag.addEventListener('click', ()=> {
+        tag.classList.toggle('active');
+      });
+    });
+
+    // 点击生成
+    document.getElementById('btnGenerate').addEventListener('click', onGenerate);
+
+    function onGenerate(){
+      // 读取输入
+      const h = parseFloat(document.getElementById('height').value) || null;
+      const w = parseFloat(document.getElementById('weight').value) || null;
+      const age = parseInt(document.getElementById('age').value) || null;
+      const dist = parseFloat(document.getElementById('distance').value) || null;
+      const duration = parseFloat(document.getElementById('duration').value) || null; // minutes
+      let paceInput = document.getElementById('pace').value.trim();
+      if(paceInput && paceInput.includes(':')){
+        const parts = paceInput.split(':').map(s=>parseInt(s));
+        if(parts.length===2 && !isNaN(parts[0]) && !isNaN(parts[1])){
+          paceInput = parts[0] + parts[1]/60;
+        } else paceInput = "";
+      }
+      const pace = (paceInput!=="" && !isNaN(paceInput)) ? parseFloat(paceInput) : null; // min per km
+      const bestTime = parseFloat(document.getElementById('bestTime').value) || null;
+      const raceOn = document.getElementById('virtualRace').checked;
+
+      // 选中标签
+      const sel = Array.from(document.querySelectorAll('.tag.active')).map(t=>t.dataset.val);
+      // =========== 1. BMI 计算 ===========
+      if(h && w){
+        const bmi = (w / Math.pow(h/100,2));
+        document.getElementById('bmi').innerText = bmi.toFixed(1);
+        let advice="";
+        if(bmi < 18.5) advice="偏瘦：建议逐步增加耐力训练并注意营养补给。";
+        else if(bmi < 24) advice="正常：维持训练强度，注意渐进式提升。";
+        else advice="偏重：建议以低冲击有氧为主，循序渐进。";
+        document.getElementById('bmiAdvice').innerText = advice;
+      } else {
+        document.getElementById('bmi').innerText = "—";
+        document.getElementById('bmiAdvice').innerText = "请填写身高与体重以获得体能评估。";
+      }
+
+      // =========== 2. 预计配速 / 卡路里 ===========
+      // 计算预期配速： 优先使用用户输入 pace；若无，用 distance & duration 计算
+      let estPace = null;
+      if(pace) estPace = pace; // min/km
+      else if(dist && duration) estPace = (duration / dist);
+
+      if(estPace){
+        // 显示 mm:ss style if integer
+        const minPart = Math.floor(estPace);
+        const secPart = Math.round((estPace - minPart)*60);
+        document.getElementById('estPace').innerText = `${minPart}:${String(secPart).padStart(2,'0')} min/km`;
+      } else {
+        document.getElementById('estPace').innerText = "—";
+      }
+
+      // 卡路里估算（基于 MET 大致值）
+      let kcalText = "—";
+      if(w && (duration || (dist && estPace))){
+        const durMin = duration ? duration : (dist * estPace);
+        // 简单用配速决定 MET
+        const paceVal = estPace || 8;
+        let MET = 6;
+        if(paceVal < 4.5) MET = 12;
+        else if(paceVal < 6) MET = 10;
+        else if(paceVal < 7) MET = 8;
+        else MET = 6;
+        const calories = MET * w * (durMin/60);
+        kcalText = Math.round(calories) + " kcal";
+        document.getElementById('calorie').innerText = kcalText;
+      } else {
+        document.getElementById('calorie').innerText = "请填写体重与时长或距离";
+      }
+
+      // 强度建议
+      let intensity = "—";
+      if(estPace){
+        if(estPace < 5) intensity = "高强度（建议间歇训练）";
+        else if(estPace < 6.5) intensity = "中高强度（可持续训练）";
+        else intensity = "中低强度（适合慢跑恢复）";
+      }
+      document.getElementById('intensity').innerText = intensity;
+
+      // =========== 3. 路线推荐（优先按标签） ===========
+      document.getElementById('selTags').innerText = sel.length ? sel.join('、') : "未选择";
+      // pick first matched route; if none, pick default
+      let chosen = null;
+      if(sel.length){
+        for(const s of sel){
+          if(ROUTES[s]){ chosen = ROUTES[s]; break; }
+        }
+      }
+      if(!chosen){
+        // default: 历史建筑（外滩）
+        chosen = ROUTES["历史建筑"];
+      }
+      document.getElementById('routeName').innerText = chosen.name;
+      // show photo
+      const img = document.getElementById('routePhoto');
+      img.src = chosen.photo;
+      img.style.display = 'block';
+
+      // draw route on map
+      drawRouteOnMap(chosen.coords);
+
+      // =========== 4. 虚拟竞赛分析 ===========
+      document.getElementById('raceOn').innerText = raceOn ? "是" : "否";
+      let raceMsg = "未开启虚拟竞赛。";
+      if(raceOn && bestTime && dist){
+        // bestTime = best total minutes for this distance (user input), compare expected total time
+        const expectedTotal = (estPace && dist) ? (estPace * dist) : (duration ? duration : null);
+        if(expectedTotal){
+          const diff = expectedTotal - bestTime;
+          if(diff < -0.1){
+            raceMsg = `🎉 太棒了！预计比你的最佳成绩快 ${Math.abs(diff).toFixed(1)} 分钟。`;
+          } else if(diff <= 0.5){
+            raceMsg = `🔥 很接近最佳成绩，仅差 ${diff.toFixed(1)} 分钟，冲刺可刷新纪录！`;
+          } else {
+            raceMsg = `💪 继续训练！预计还差 ${diff.toFixed(1)} 分钟以打破纪录。`;
+          }
+        } else {
+          raceMsg = "请填写距离与时长/配速以分析竞赛成绩。";
+        }
+      }
+      document.getElementById('raceMsg').innerText = raceMsg;
+
+      // small UX alert
+      // window.scrollTo({top: document.getElementById('map').offsetTop - 20, behavior:'smooth'});
+    }
+
+    // draw route
+    function clearRoute(){
+      if(currentPolyline){ map.remove(currentPolyline); currentPolyline = null; }
+      currentMarkers.forEach(m => map.remove(m));
+      currentMarkers = [];
+    }
+    function drawRouteOnMap(coords){
+      clearRoute();
+      // convert to AMap.LngLat objects if needed
+      const path = coords.map(c => new AMap.LngLat(c[0], c[1]));
+      currentPolyline = new AMap.Polyline({
+        path: path,
+        strokeColor: "#00796b",
+        strokeWeight: 6,
+        lineJoin: 'round',
+        lineCap: 'round',
+      });
+      map.add(currentPolyline);
+      // add markers
+      coords.forEach((c,i)=>{
+        const marker = new AMap.Marker({
+          position: c,
+          title: i===0 ? '起点' : (i===coords.length-1 ? '终点' : `途经${i}`),
+        });
+        map.add(marker);
+        currentMarkers.push(marker);
+      });
+      map.setFitView([currentPolyline]);
+    }
+
+    // 初始化时显示默认路线
+    window.onload = () => {
+      // draw default historical route
+      drawRouteOnMap(ROUTES["历史建筑"].coords);
+      document.getElementById('routePhoto').src = ROUTES["历史建筑"].photo;
+      document.getElementById('routePhoto').style.display = 'block';
+      document.getElementById('routeName').innerText = ROUTES["历史建筑"].name;
+      document.getElementById('selTags').innerText = "历史建筑（默认）";
+    }
+  </script>
+</body>
+</html>
