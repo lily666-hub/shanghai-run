@@ -1,52 +1,79 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>上海城市跑 | 跑过上海，每一步都是风景</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://webapi.amap.com/maps?v=2.0&key=5c65d76d3600ef99bc76b95adb89c022"></script>
-</head>
-<body>
-  <header class="hero-section">
-    <h1>跑过上海，每一步都是风景</h1>
-  </header>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>上海城市跑 · 跑过上海，每一步都是风景</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
 
-  <main class="form-container">
-    <section class="card base-info">
-      <h2><span>🏃‍♂️</span> 体能基础</h2>
-      <input type="number" placeholder="身高 (cm)">
-      <input type="number" placeholder="体重 (kg)">
-      <input type="number" placeholder="年龄">
-    </section>
+  <body>
+    <div class="overlay">
+      <header>
+        <h1>跑过上海，每一步都是风景</h1>
+        <p>在城市里跑，感受历史与现代的交融</p>
+      </header>
 
-    <section class="card sport-pref">
-      <h2><span>🌇</span> 运动偏好</h2>
-      <input type="number" placeholder="预期跑步距离 (km)">
-      <input type="number" placeholder="预期时长 (分钟)">
-      <input type="text" placeholder="目标配速 (min/km)">
-    </section>
+      <main class="form-container">
+        <!-- 体能基础 -->
+        <section class="card">
+          <h2>🏃‍♂️ 体能基础</h2>
+          <label>身高 (cm)</label>
+          <input type="number" id="height" placeholder="例如 170" />
 
-    <section class="card interest-line">
-      <h2><span>📷</span> 兴趣路线</h2>
-      <div class="tags">
-        <button>历史建筑</button>
-        <button>现代艺术</button>
-        <button>自然风光</button>
-        <button>市井烟火气</button>
-      </div>
-    </section>
+          <label>体重 (kg)</label>
+          <input type="number" id="weight" placeholder="例如 60" />
 
-    <section class="card challenge-goal">
-      <h2><span>🏆</span> 挑战目标</h2>
-      <label><input type="checkbox"> 开启虚拟竞赛</label>
-      <input type="text" placeholder="最佳成绩（分钟）">
-      <button id="generate-route">生成我的专属上海跑路线</button>
-    </section>
-  </main>
+          <label>年龄</label>
+          <input type="number" id="age" placeholder="例如 28" />
+        </section>
 
-  <section id="map"></section>
+        <!-- 运动偏好 -->
+        <section class="card">
+          <h2>⏱️ 运动偏好</h2>
+          <label>预期跑步距离 (km)</label>
+          <input type="number" id="distance" placeholder="例如 5" />
 
-  <script src="script.js"></script>
-</body>
+          <label>预期时长 (分钟)</label>
+          <input type="number" id="duration" placeholder="例如 30" />
+
+          <label>目标配速 (min/km)</label>
+          <input type="text" id="pace" placeholder="例如 6:00" />
+        </section>
+
+        <!-- 兴趣路线 -->
+        <section class="card">
+          <h2>📸 兴趣路线</h2>
+          <div class="tags">
+            <label><input type="checkbox" value="历史建筑" /> 历史建筑</label>
+            <label><input type="checkbox" value="现代艺术" /> 现代艺术</label>
+            <label><input type="checkbox" value="自然风光" /> 自然风光</label>
+            <label><input type="checkbox" value="市井烟火气" /> 市井烟火气</label>
+          </div>
+        </section>
+
+        <!-- 挑战目标 -->
+        <section class="card">
+          <h2>🏆 挑战目标</h2>
+          <label>
+            <input type="checkbox" id="challenge" />
+            是否开启虚拟竞赛
+          </label>
+
+          <label>最佳成绩（分钟）</label>
+          <input type="number" id="bestTime" placeholder="例如 25" />
+
+          <button id="generateRoute">生成我的专属上海跑路线</button>
+        </section>
+      </main>
+
+      <!-- 地图展示区域 -->
+      <section class="map-section">
+        <div id="map"></div>
+      </section>
+    </div>
+
+    <script src="https://webapi.amap.com/maps?v=2.0&key=5c65d76d3600ef99bc76b95adb89c022"></script>
+    <script src="script.js"></script>
+  </body>
 </html>
