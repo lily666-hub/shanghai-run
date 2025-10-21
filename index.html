@@ -1,42 +1,187 @@
-<!DOCTYPE html>//注释
-<html>
-  <head>
-    <meta charset="utf-8" />
-    <title>上海城市跑</title>
-    <style>
-      #container {
-        width: 100%;
-        height: 400px;
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>上海城市跑</title>
+  <style>
+    body {
+      font-family: "Microsoft YaHei", sans-serif;
+      background: linear-gradient(to bottom right, #e0f7fa, #ffffff);
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: #fff;
+      width: 90%;
+      max-width: 600px;
+      margin: 40px auto;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      padding: 30px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #00796b;
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      color: #004d40;
+      font-size: 20px;
+      border-left: 4px solid #00796b;
+      padding-left: 8px;
+      margin-top: 25px;
+    }
+
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      color: #333;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .checkbox-group label {
+      display: inline-block;
+      margin-right: 10px;
+    }
+
+    button {
+      background: #00796b;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+      width: 100%;
+    }
+
+    button:hover {
+      background: #004d40;
+    }
+
+    .result {
+      background: #f1f8e9;
+      border-radius: 8px;
+      padding: 15px;
+      margin-top: 20px;
+    }
+
+    .result h3 {
+      color: #33691e;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🏃‍♀️ 上海城市跑</h1>
+    <p style="text-align:center; color:#666;">探索上海风光 · 科学健身 · 享受奔跑</p>
+
+    <h2>1️⃣ 基础信息</h2>
+    <label>身高 (cm):</label>
+    <input type="number" id="height" placeholder="例如 170" />
+
+    <label>体重 (kg):</label>
+    <input type="number" id="weight" placeholder="例如 60" />
+
+    <label>年龄:</label>
+    <input type="number" id="age" placeholder="例如 25" />
+
+    <h2>2️⃣ 运动偏好</h2>
+    <label>预期跑步距离 (km):</label>
+    <input type="number" id="distance" placeholder="例如 5" />
+
+    <label>目标时长 (分钟):</label>
+    <input type="number" id="duration" placeholder="例如 30" />
+
+    <label>目标配速 (分钟/公里):</label>
+    <input type="number" id="pace" placeholder="例如 6" />
+
+    <h2>3️⃣ 兴趣标签</h2>
+    <div class="checkbox-group">
+      <label><input type="checkbox" value="历史建筑" /> 历史建筑</label>
+      <label><input type="checkbox" value="现代艺术" /> 现代艺术</label>
+      <label><input type="checkbox" value="自然风光" /> 自然风光</label>
+      <label><input type="checkbox" value="市井烟火气" /> 市井烟火气</label>
+    </div>
+
+    <h2>4️⃣ 挑战目标</h2>
+    <label><input type="checkbox" id="virtualRace" /> 开启虚拟竞赛</label>
+    <label>最佳成绩（分钟）:</label>
+    <input type="number" id="bestTime" placeholder="例如 25" />
+
+    <button onclick="analyze()">生成建议</button>
+
+    <div id="result" class="result" style="display:none;"></div>
+  </div>
+
+  <script>
+    function analyze() {
+      const height = parseFloat(document.getElementById('height').value);
+      const weight = parseFloat(document.getElementById('weight').value);
+      const age = parseInt(document.getElementById('age').value);
+      const distance = parseFloat(document.getElementById('distance').value);
+      const duration = parseFloat(document.getElementById('duration').value);
+      const pace = parseFloat(document.getElementById('pace').value);
+      const bestTime = parseFloat(document.getElementById('bestTime').value);
+      const race = document.getElementById('virtualRace').checked;
+
+      // 计算BMI
+      const bmi = (weight / Math.pow(height/100, 2)).toFixed(1);
+      let fitness;
+      if (bmi < 18.5) fitness = "偏瘦";
+      else if (bmi < 24) fitness = "正常";
+      else fitness = "需要控制";
+
+      // 兴趣标签推荐
+      const selectedTags = Array.from(document.querySelectorAll('.checkbox-group input:checked')).map(i => i.value);
+      let routeSuggest = "";
+      if (selectedTags.includes("历史建筑")) routeSuggest += "🏰 外滩历史风光线；";
+      if (selectedTags.includes("现代艺术")) routeSuggest += "🎨 西岸艺术跑道；";
+      if (selectedTags.includes("自然风光")) routeSuggest += "🌳 世纪公园环线；";
+      if (selectedTags.includes("市井烟火气")) routeSuggest += "🏮 徐汇衡山路夜跑线；";
+      if (!routeSuggest) routeSuggest = "🚶‍♂️ 推荐人民广场周边基础路线。";
+
+      // 挑战模式
+      let raceText = "";
+      if (race && bestTime) {
+        const currentPace = (duration / distance).toFixed(1);
+        if (currentPace < bestTime / distance) {
+          raceText = `🎉 你已超越过去的自己！配速提升 ${(bestTime/distance - currentPace).toFixed(1)} 分钟/公里！`;
+        } else {
+          raceText = `💪 再接再厉！还差 ${(currentPace - bestTime/distance).toFixed(1)} 分钟/公里即可刷新纪录！`;
+        }
       }
-    </style>
-  </head>
-  <body>
-    <h2>🏃‍♀️ 上海城市跑</h2>
-    <div id="container"></div>
 
-    <script src="https://webapi.amap.com/maps?v=2.0&key=52afdaf1e8e98c53d39e3050068291de"></script>
-    <script>
-      var map = new AMap.Map('container', {
-        zoom: 15,
-        center: [121.4737, 31.2304], // 默认上海市中心
-      });
-
-      AMap.plugin('AMap.Geolocation', function () {
-        var geolocation = new AMap.Geolocation({
-          enableHighAccuracy: true,
-          timeout: 10000,
-          position: 'RB',
-        });
-        map.addControl(geolocation);
-        geolocation.getCurrentPosition(function (status, result) {
-          if (status === 'complete') {
-            map.setCenter(result.position);
-          } else {
-            alert('定位失败，请检查浏览器定位权限');
-          }
-        });
-      });
-    </script>
-  </body>
+      // 输出
+      const resultDiv = document.getElementById("result");
+      resultDiv.style.display = "block";
+      resultDiv.innerHTML = `
+        <h3>🏁 结果与建议</h3>
+        <p><strong>BMI:</strong> ${bmi} (${fitness})</p>
+        <p><strong>推荐路线:</strong> ${routeSuggest}</p>
+        <p><strong>跑步目标:</strong> 距离 ${distance} km · 计划时长 ${duration} 分钟 · 目标配速 ${pace} 分钟/公里</p>
+        ${race ? `<p><strong>挑战模式:</strong> ${raceText}</p>` : ""}
+        <p>🌟 加油！今天的每一步，都是在探索上海的另一面。</p>
+      `;
+    }
+  </script>
+</body>
 </html>
-
